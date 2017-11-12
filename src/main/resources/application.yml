@@ -6,10 +6,9 @@ spring:
         name: mybatis-test
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
-        #url: jdbc:mysql://192.168.78.114/callout20?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
         url: jdbc:mysql://localhost/test?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
         username: root
-        password: mcdev
+        password: 
         driver-class-name: com.mysql.jdbc.Driver
         initialSize: 5
         minIdle: 5
