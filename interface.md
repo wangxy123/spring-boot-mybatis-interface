@@ -1,0 +1,87 @@
+# 通用数据库操作接口
+
+
+## 接口说明
+---
+1. **类型**：http+post
+2.  **地址**：http://ip:port/openapi/v1/{tableName}/{methodNanme}
+3. **说明**：``tablename``为数据库表名转大驼峰格式。
+					``methodName``详见下面说明
+4. **body**： 为方法参数的json格式
+5. **header**：鉴权字段，暂无。
+6.  **返回**：
+|编号|字段名|类型|描述|
+|:-:|:-:|:-:|:-:|
+|1|returncode|String|返回码|
+|2|returndesc|String|返回描述|
+|3|data|String|返回内容，方法返回对象的json格式|
+7. **返回码**：
+|编号|returncode|returndesc|描述|
+|:-:|:-:|:-:|:-:|
+|1|000000|成功||
+|2|999000|失败|正常失败|
+|3|999999|服务器内部错误|服务器未知异常情况|
+|4|100001|参数格式错误||
+|5|100002|请求表名不存在|tableName不存在|
+|6|100003|请求方法名不存在|methodName不存在|
+|8|100005|请求时间错误|暂无，预留|
+|9|400001|鉴权失败|暂无，预留|
+|10|400004|接口未实现|暂无，预留|
+
+
+
+## methodName列表：
+---
+### Select
+
+**方法**：```List<T> select(T record);```
+**说明**：根据实体中的属性值进行查询，查询条件使用等号.
+**selectAll**：查询全部结果可以使用select(null)
+**分页**：如需分页，可在请求参数中增加：
+```{
+"page":1,
+"rows":10
+}```
+
+
+**方法**：```int selectCount(T record);```
+**说明**：根据实体中的属性查询总数，查询条件使用等号
+
+**方法**：```T selectOne(T record);```
+**说明**：根据实体中的属性进行查询，只能有一个返回值，有多个结果是抛出异常，查询条件使用等号
+
+~~####condition:
+ **方法**：```List<T> selectByCondition(Object condition);``` 
+ **说明**：根据Condition条件进行查询~~
+
+
+### Insert
+
+**方法**：```int insert(T record);```
+**说明**：保存一个实体，null的属性也会保存，不会使用数据库默认值
+
+**方法**：```int insertList(List<T> recordList);```
+**说明**：批量插入，支持批量插入的数据库可以使用，例如MySQL,H2等。
+**mysql使用**：*除主键，时间列外其他列需要不为null。*
+
+**方法**：```int insertSelective(T record);```
+**说明**：保存一个实体，null的属性不会保存，会使用数据库默认值
+
+
+### Update
+
+**方法**：```int updateByPrimaryKey(T record);```
+**说明**：根据主键更新实体全部字段，null值会被更新
+
+**方法**：```int updateByPrimaryKeySelective(T record);```
+**说明**：根据主键更新属性不为null的值
+
+
+### Delete
+
+**方法**：```int delete(T record);```
+**说明**：根据实体属性作为条件进行删除，查询条件使用等号
+**注意：慎用，如果参数为null则会删除所有数据！！！**
+
+~~**方法**：```int deleteByPrimaryKey(Object key);```
+**说明**：根据主键字段进行删除，方法参数必须包含完整的主键属性~~

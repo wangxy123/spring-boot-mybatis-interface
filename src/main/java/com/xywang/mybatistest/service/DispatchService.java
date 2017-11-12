@@ -26,7 +26,6 @@ public class DispatchService {
 		// 获取参数类型
 		Class[] paramTypes = method.getParameterTypes();
 		Class paraType = paramTypes[0];
-		// JSONObject entity = paraType.newInstance();
 		JSONObject entity = (JSONObject) JSON.parseObject(req, paraType);
 		// 分页
 		Integer page = entity.getInteger("page");
