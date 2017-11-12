@@ -1,0 +1,41 @@
+server:
+    port: 9502
+#name，唯一标识
+spring:
+    application:
+        name: mybatis-test
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        #url: jdbc:mysql://192.168.78.114/callout20?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+        url: jdbc:mysql://localhost/test?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+        username: root
+        password: mcdev
+        driver-class-name: com.mysql.jdbc.Driver
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        maxPoolPreparedStatementPerConnectionSize: 20
+log:
+    path: F:\log
+# mybatis 配置
+mybatis:
+    type-aliases-package: com.xywang.mybatistest.model
+    mapper-locations: classpath:mapper/*.xml
+# 通用 Mapper 配置
+mapper:
+    mappers: com.xywang.mybatistest.common.util.MyMapper
+    not-empty: false
+    identity: MYSQL
+# 分页插件配置
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql

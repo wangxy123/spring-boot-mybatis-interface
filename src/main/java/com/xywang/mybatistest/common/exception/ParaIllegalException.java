@@ -1,0 +1,37 @@
+package com.xywang.mybatistest.common.exception;
+
+/**
+ * @ClassName: ParaIllegalException
+ * @Description: 参数格式错误异常
+ * @author xywang
+ * @date 2017年9月19日 下午1:05:04
+ */
+public class ParaIllegalException extends RuntimeException {
+
+	/**
+	 * @Fields serialVersionUID
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ParaIllegalException() {
+		super();
+	}
+
+	public ParaIllegalException(String message) {
+		super(message);
+	}
+
+	public ParaIllegalException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ParaIllegalException(Throwable cause) {
+		super(cause);
+	}
+
+	protected ParaIllegalException(String message, Throwable cause,
+			boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+}
