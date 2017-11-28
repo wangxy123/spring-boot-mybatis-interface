@@ -19,14 +19,21 @@ public class SqlController {
 	DispatchService dispatchService;
 
 	@ResponseBody
-	@RequestMapping(value = "/{tablename}/{methodNanme}", method = RequestMethod.POST)
-	public Result<?> doSql(@PathVariable("tablename") String tableName,
-			@PathVariable("methodNanme") String methodNanme,
+	@RequestMapping(value = "/default/{tableName}/{methodName}", method = RequestMethod.POST)
+	public Result<?> doSql(@PathVariable("tableName") String tableName,
+			@PathVariable("methodName") String methodName,
 			@RequestBody String req) throws Exception {
 
-		// List<SystemPara> res = systemParaService.select(entity);
-		// userService.save(user);
-		return new Result<>(dispatchService.doSql(tableName, methodNanme, req));
+		return new Result<>(dispatchService.doSql(tableName, methodName, req));
 
 	}
+
+	@ResponseBody
+	@RequestMapping(value = "/example/{tableName}/{methodName}",method = RequestMethod.POST)
+	public Result<?> doExampleSql(@PathVariable("tableName") String tableName,
+								 @PathVariable("methodName") String methodName,
+								 @RequestBody String req)throws Exception{
+		return new Result<>(dispatchService.doExampleSql(tableName, methodName, req));
+	}
+
 }
