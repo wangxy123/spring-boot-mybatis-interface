@@ -1,12 +1,12 @@
 package com.xywang.mybatistest.service;
 
 import java.lang.reflect.Method;
-import java.util.Map;
+import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
 import com.xywang.mybatistest.common.entity.Between;
 import com.xywang.mybatistest.common.entity.OrderBy;
 import com.xywang.mybatistest.common.entity.Paging;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -16,29 +16,53 @@ import com.xywang.mybatistest.common.CommonDef;
 import com.xywang.mybatistest.common.util.SpringUtil;
 import tk.mybatis.mapper.entity.Example;
 
+/**
+ * @author 1
+ */
 @Service
 public class DispatchService {
 
+	private static final String LIST_METHOD="insertList";
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object doSql(String tableName, String methodName, String req)
 			throws Exception {
-
+		boolean isList = LIST_METHOD.equals(methodName);
 		// 获取service类型
 		Class<?> c = Class.forName(String.format(
 				CommonDef.Mybatis.SERVICE_PACKAGE, tableName));
 		// 获取方法
-		Method method = c.getMethod(methodName, Object.class);
-		// 获取参数类型
-		Class[] paramTypes = method.getParameterTypes();
-		Class paraType = paramTypes[0];
-		JSONObject entity = (JSONObject) JSON.parseObject(req, paraType);
-		// 分页
-		Integer page = entity.getInteger("page");
-		Integer rows = entity.getInteger("rows");
-		if (page != null && rows != null) {
-			PageHelper.startPage(page, rows);
+		Method method = null;
+		if(isList){
+			method = c.getMethod(methodName, List.class);
+		}else{
+			method = c.getMethod(methodName, Object.class);
 		}
-		return method.invoke(SpringUtil.getBean(c), new Object[] { entity });
+		//获取mode类型
+		Class<?> m = Class.forName(String.format(CommonDef.Mybatis.MODE_PACKAGE,tableName));
+
+		JSONObject entity = JSON.parseObject(req);
+
+		Paging paging = null;
+		if(entity.containsKey(CommonDef.ParaKey.PAGING)){
+			paging = entity.getJSONObject(CommonDef.ParaKey.PAGING).toJavaObject(Paging.class);
+			entity.remove(CommonDef.ParaKey.PAGING);
+		}
+
+		Object para = null;
+		if(entity.containsKey(CommonDef.ParaKey.PARA) && entity.getJSONObject(CommonDef.ParaKey.PARA)!=null){
+			if(isList){
+				para = JSON.parseArray(entity.getString(CommonDef.ParaKey.PARA),m);
+			}else{
+				para = entity.getJSONObject(CommonDef.ParaKey.PARA).toJavaObject(m);
+			}
+			entity.remove(CommonDef.ParaKey.PARA);
+		}
+
+		// 分页
+		if (paging != null && paging.getPage() != null && paging.getRows()!=null) {
+			PageHelper.startPage(Integer.parseInt(paging.getPage()), Integer.parseInt(paging.getRows()));
+		}
+		return method.invoke(SpringUtil.getBean(c), new Object[] { para });
 	}
 
 	public Object doExampleSql(String tableName, String methodName, String req)throws Exception{
@@ -78,10 +102,24 @@ public class DispatchService {
 				example.orderBy(orderBy.getKey()).asc();
 			}
 		}
-
-		for(Map.Entry<String,Object> prop : entity.entrySet()){
-			if(StringUtils.isNotBlank(String.valueOf(prop.getValue()))){
-				criteria.andEqualTo(prop.getKey(),prop.getValue());
+		Object para = null;
+		if(entity.containsKey(CommonDef.ParaKey.PARA)&&entity.getJSONObject(CommonDef.ParaKey.PARA)!=null){
+			para = entity.getJSONObject(CommonDef.ParaKey.PARA).toJavaObject(m);
+			entity.remove(CommonDef.ParaKey.PARA);
+		}
+		criteria.andEqualTo(para);
+		JSONArray likes = null;
+		if(entity.containsKey(CommonDef.ParaKey.LIKE)){
+			likes = entity.getJSONArray(CommonDef.ParaKey.LIKE);
+			entity.remove(CommonDef.ParaKey.LIKE);
+		}
+		JSONObject like = null;
+		if(likes!=null&&likes.size()>0){
+			for(int i=0;i<likes.size();i++){
+				like = likes.getJSONObject(i);
+				if(like!=null&&like.containsKey(CommonDef.Para.KEY)&&like.containsKey(CommonDef.Para.VALUE)){
+					criteria.andLike(like.getString(CommonDef.Para.KEY),like.getString(CommonDef.Para.VALUE));
+				}
 			}
 		}
 
@@ -93,6 +131,6 @@ public class DispatchService {
 			PageHelper.startPage(Integer.parseInt(paging.getPage(),Integer.parseInt(paging.getRows())));
 		}
 
-		return method.invoke(SpringUtil.getBean(c), new Object[] { entity });
+		return method.invoke(SpringUtil.getBean(c), new Object[] { example });
 	}
 }

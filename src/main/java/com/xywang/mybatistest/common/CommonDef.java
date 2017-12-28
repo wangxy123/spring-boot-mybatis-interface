@@ -10,12 +10,16 @@ public class CommonDef {
 	}
 
 	public class ParaKey {
+		public static final String LIKE = "like";
+		public static final String PARA = "para";
 		public static final String BETWEEN = "between";
 		public static final String ORDERBY = "orderBy";
 		public static final String PAGING = "paging";
 	}
 
 	public class Para {
+		public static final String KEY = "key";
+		public static final String VALUE = "value";
 		public static final String DESC = "desc";
 		public static final String ASC = "asc";
 	}
